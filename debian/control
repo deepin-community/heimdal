@@ -12,29 +12,22 @@ Build-Depends: bison,
                libcap-ng-dev [linux-any],
                libdb-dev,
                libedit-dev,
-               libhesiod-dev,
                libjson-perl,
                libldap2-dev,
-               libncurses5-dev,
-               libperl4-corelibs-perl,
+               libncurses-dev,
                libsqlite3-dev,
-               libx11-dev,
-               libxau-dev,
-               libxt-dev,
                netbase,
                pkg-config,
                python3,
-               ss-dev,
                texinfo,
                unzip,
-               x11proto-core-dev
 Vcs-Browser: https://salsa.debian.org/debian/heimdal
 Vcs-Git: https://salsa.debian.org/debian/heimdal.git
 
 Package: heimdal-docs
 Section: doc
 Architecture: all
-Depends: dpkg (>= 1.15.4) | install-info, ${misc:Depends}
+Depends: ${misc:Depends}
 Suggests: heimdal-clients, heimdal-servers
 Multi-Arch: foreign
 Description: Heimdal Kerberos - documentation
@@ -54,7 +47,6 @@ Conflicts: heimdal-clients (<< 0.4e-3),
 Depends: debconf (>= 0.5.00) | debconf-2.0,
          heimdal-clients,
          krb5-config,
-         lsb-base,
          openbsd-inetd|inet-superserver,
          ${misc:Depends},
          ${shlibs:Depends}
@@ -73,11 +65,12 @@ Description: Heimdal Kerberos - key distribution center (KDC)
 Package: heimdal-multidev
 Section: devel
 Architecture: any
+Multi-Arch: no
 Conflicts: heimdal-clients (<< 0.4e-7), kerberos4kth-dev
 Depends: comerr-dev,
          libasn1-8-heimdal (= ${binary:Version}),
          libgssapi3-heimdal (= ${binary:Version}),
-         libhcrypto4-heimdal (= ${binary:Version}),
+         libhcrypto5-heimdal (= ${binary:Version}),
          libhdb9-heimdal (= ${binary:Version}),
          libheimbase1-heimdal (= ${binary:Version}),
          libhx509-5-heimdal (= ${binary:Version}),
@@ -108,7 +101,7 @@ Depends: heimdal-multidev (= ${binary:Version}), ${misc:Depends}
 Section: devel
 Conflicts: libkrb5-dev
 Architecture: any
-Multi-Arch: same
+Multi-Arch: no
 Description: Heimdal Kerberos - development files
  Heimdal is a free implementation of Kerberos 5 that aims to be
  compatible with MIT Kerberos.
@@ -130,7 +123,7 @@ Description: Heimdal Kerberos - clients
 
 Package: heimdal-kcm
 Architecture: any
-Depends: ${misc:Depends}, ${shlibs:Depends}, lsb-base
+Depends: ${misc:Depends}, ${shlibs:Depends}
 Description: Heimdal Kerberos - KCM daemon
  Heimdal is a free implementation of Kerberos 5 that aims to be
  compatible with MIT Kerberos.
@@ -252,7 +245,7 @@ Description: Heimdal Kerberos - KAFS support library
  .
  This package contains the library for KAFS support.
 
-Package: libroken18-heimdal
+Package: libroken19-heimdal
 Multi-Arch: same
 Pre-Depends: ${misc:Pre-Depends}
 Section: libs
@@ -338,7 +331,7 @@ Description: Heimdal Kerberos - stringprep implementation
  .
  This package contains the stringprep library.
 
-Package: libhcrypto4-heimdal
+Package: libhcrypto5-heimdal
 Multi-Arch: same
 Pre-Depends: ${misc:Pre-Depends}
 Section: libs

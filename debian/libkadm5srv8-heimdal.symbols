@@ -40,11 +40,13 @@ libkadm5srv.so.8 #PACKAGE# #MINVER#
  kadm5_log_get_version@HEIMDAL_KAMD5_SERVER_1.0 1.4.0+git20110226
  kadm5_log_get_version_fd@HEIMDAL_KAMD5_SERVER_1.0 1.4.0+git20110226
  kadm5_log_goto_end@HEIMDAL_KAMD5_SERVER_1.0 1.4.0+git20110226
+ kadm5_log_goto_first@HEIMDAL_KAMD5_SERVER_1.0 7.8.git20221115.a6cf945+dfsg
  kadm5_log_init@HEIMDAL_KAMD5_SERVER_1.0 1.4.0+git20110226
  kadm5_log_init_nb@HEIMDAL_KAMD5_SERVER_1.0 1.7~git20160418
  kadm5_log_init_nolock@HEIMDAL_KAMD5_SERVER_1.0 1.7~git20160418
  kadm5_log_init_sharedlock@HEIMDAL_KAMD5_SERVER_1.0 1.7~git20160418
  kadm5_log_modify@HEIMDAL_KAMD5_SERVER_1.0 1.4.0+git20110226
+ kadm5_log_next@HEIMDAL_KAMD5_SERVER_1.0 7.8.git20221115.a6cf945+dfsg
  kadm5_log_nop@HEIMDAL_KAMD5_SERVER_1.0 1.4.0+git20110226
  kadm5_log_previous@HEIMDAL_KAMD5_SERVER_1.0 1.4.0+git20110226
  kadm5_log_recover@HEIMDAL_KAMD5_SERVER_1.0 1.7~git20160418

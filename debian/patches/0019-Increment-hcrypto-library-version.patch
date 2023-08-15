@@ -1,0 +1,21 @@
+From: Brian May <bam@debian.org>
+Date: Thu, 24 Nov 2022 09:02:08 +1100
+Subject: Increment hcrypto library version
+
+---
+ lib/hcrypto/Makefile.am | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/lib/hcrypto/Makefile.am b/lib/hcrypto/Makefile.am
+index e0dccd2..52a4d05 100644
+--- a/lib/hcrypto/Makefile.am
++++ b/lib/hcrypto/Makefile.am
+@@ -14,7 +14,7 @@ AM_CPPFLAGS += -I$(top_srcdir)/lib/hx509 \
+ lib_LTLIBRARIES = libhcrypto.la
+ check_LTLIBRARIES = libhctest.la
+ 
+-libhcrypto_la_LDFLAGS = -version-info 5:0:1
++libhcrypto_la_LDFLAGS = -version-info 5:0:0
+ libhcrypto_la_LIBADD = \
+ 	$(top_builddir)/lib/asn1/libasn1.la \
+ 	$(LIB_dlopen) \

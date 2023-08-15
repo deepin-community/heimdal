@@ -19,7 +19,7 @@ Subject: hurd_maxhostnamelen
  13 files changed, 18 insertions(+), 18 deletions(-)
 
 diff --git a/appl/gssmask/gssmask.c b/appl/gssmask/gssmask.c
-index 35c5489..bc9c3f7 100644
+index b61db3d..3d5ad89 100644
 --- a/appl/gssmask/gssmask.c
 +++ b/appl/gssmask/gssmask.c
 @@ -55,7 +55,7 @@ struct client {
@@ -31,7 +31,7 @@ index 35c5489..bc9c3f7 100644
  };
  
  FILE *logfile;
-@@ -1095,7 +1095,7 @@ create_client(krb5_socket_t sock, int port, const char *moniker)
+@@ -1097,7 +1097,7 @@ create_client(krb5_socket_t sock, int port, const char *moniker)
      if (moniker) {
  	c->moniker = estrdup(moniker);
      } else {
@@ -80,7 +80,7 @@ index 6f61a8e..2f6d5e6 100644
      ret = gethostname(localhost, sizeof(localhost) - 1);
      if (ret != 0) {
 diff --git a/lib/gssapi/spnego/accept_sec_context.c b/lib/gssapi/spnego/accept_sec_context.c
-index 48b786c..63940c8 100644
+index 5fe1a1a..8874648 100644
 --- a/lib/gssapi/spnego/accept_sec_context.c
 +++ b/lib/gssapi/spnego/accept_sec_context.c
 @@ -366,7 +366,7 @@ select_mech(OM_uint32 *minor_status, MechType *mechType, int verify_p,
@@ -141,10 +141,10 @@ index 873734f..8445acf 100644
  	for (j = 0; j < sizeof(types)/sizeof(*types); ++j) {
  	    printf ("%s for %s:\n", type_str[j], argv[i]);
 diff --git a/lib/krb5/krbhst.c b/lib/krb5/krbhst.c
-index f535128..c0e1f3b 100644
+index 36da64b..fb313f8 100644
 --- a/lib/krb5/krbhst.c
 +++ b/lib/krb5/krbhst.c
-@@ -1071,7 +1071,7 @@ gethostlist(krb5_context context, const char *realm,
+@@ -1077,7 +1077,7 @@ gethostlist(krb5_context context, const char *realm,
      krb5_error_code ret;
      int nhost = 0;
      krb5_krbhst_handle handle;
@@ -154,7 +154,7 @@ index f535128..c0e1f3b 100644
  
      ret = krb5_krbhst_init(context, realm, type, &handle);
 diff --git a/lib/krb5/principal.c b/lib/krb5/principal.c
-index 23c4592..743e38b 100644
+index 937a9a7..e2ee202 100644
 --- a/lib/krb5/principal.c
 +++ b/lib/krb5/principal.c
 @@ -1049,7 +1049,7 @@ krb5_sname_to_principal_old(krb5_context context,
@@ -166,7 +166,7 @@ index 23c4592..743e38b 100644
      char **realms = NULL, *host = NULL;
  
      if(type != KRB5_NT_SRV_HST && type != KRB5_NT_UNKNOWN) {
-@@ -1346,7 +1346,7 @@ krb5_sname_to_principal(krb5_context context,
+@@ -1370,7 +1370,7 @@ krb5_sname_to_principal(krb5_context context,
      char *realm, *remote_host;
      krb5_error_code ret;
      register char *cp;
@@ -175,7 +175,7 @@ index 23c4592..743e38b 100644
  
      *ret_princ = NULL;
  
-@@ -1355,8 +1355,8 @@ krb5_sname_to_principal(krb5_context context,
+@@ -1379,8 +1379,8 @@ krb5_sname_to_principal(krb5_context context,
  	return KRB5_SNAME_UNSUPP_NAMETYPE;
  
      /* if hostname is NULL, use local hostname */
@@ -187,7 +187,7 @@ index 23c4592..743e38b 100644
  	hostname = localname;
      }
 diff --git a/lib/krb5/test_plugin.c b/lib/krb5/test_plugin.c
-index ed6a9e7..c18db56 100644
+index cfc3b6c..87ffc51 100644
 --- a/lib/krb5/test_plugin.c
 +++ b/lib/krb5/test_plugin.c
 @@ -88,7 +88,7 @@ main(int argc, char **argv)

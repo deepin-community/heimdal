@@ -111,10 +111,7 @@ pk_check_pkauthenticator(krb5_context context,
 			 PKAuthenticator *a,
 			 const KDC_REQ *req)
 {
-    u_char *buf = NULL;
-    size_t buf_size;
     krb5_error_code ret;
-    size_t len = 0;
     krb5_timestamp now;
     Checksum checksum;
 
@@ -126,22 +123,13 @@ pk_check_pkauthenticator(krb5_context context,
 	return KRB5KRB_AP_ERR_SKEW;
     }
 
-    ASN1_MALLOC_ENCODE(KDC_REQ_BODY, buf, buf_size, &req->req_body, &len, ret);
-    if (ret) {
-	krb5_clear_error_message(context);
-	return ret;
-    }
-    if (buf_size != len)
-	krb5_abortx(context, "Internal error in ASN.1 encoder");
-
     ret = krb5_create_checksum(context,
 			       NULL,
 			       0,
 			       CKSUMTYPE_SHA1,
-			       buf,
-			       len,
+			       req->req_body._save.data,
+			       req->req_body._save.length,
 			       &checksum);
-    free(buf);
     if (ret) {
 	krb5_clear_error_message(context);
 	return ret;
@@ -241,8 +229,6 @@ generate_dh_keyblock(krb5_context context,
 	    memmove(dh_gen_key + size, dh_gen_key, dh_gen_keylen);
 	    memset(dh_gen_key, 0, size);
 	}
-
-	ret = 0;
     } else if (client_params->keyex == USE_ECDH) {
 	if (client_params->u.ecdh.public_key == NULL) {
 	    ret = KRB5KRB_ERR_GENERIC;
@@ -623,7 +609,8 @@ _kdc_pk_rd_padata(krb5_context context,
 	hx509_certs signer_certs;
 	int flags = HX509_CMS_VS_ALLOW_DATA_OID_MISMATCH; /* BTMM */
 
-	if (_kdc_is_anonymous(context, client->entry.principal))
+	if (_kdc_is_anonymous(context, client->entry.principal)
+	    || (config->historical_anon_realm && _kdc_is_anon_request(req)))
 	    flags |= HX509_CMS_VS_ALLOW_ZERO_SIGNER;
 
 	ret = hx509_cms_verify_signed(context->hx509ctx,
@@ -1676,7 +1663,8 @@ _kdc_pk_check_client(krb5_context context,
     size_t i;
 
     if (cp->cert == NULL) {
-	if (!_kdc_is_anonymous(context, client->entry.principal))
+	if (!_kdc_is_anonymous(context, client->entry.principal)
+	    && !config->historical_anon_realm)
 	    return KRB5KDC_ERR_BADOPTION;
 
 	*subject_name = strdup("<unauthenticated anonymous client>");

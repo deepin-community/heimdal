@@ -4,7 +4,7 @@ DEB_HOST_MULTIARCH ?= $(shell dpkg-architecture -qDEB_HOST_MULTIARCH)
 export DEB_BUILD_MAINT_OPTIONS=hardening=+all
 
 %:
-	dh $* --parallel
+	dh $*
 
 override_dh_autoreconf:
 	dh_autoreconf --as-needed
@@ -17,18 +17,18 @@ override_dh_makeshlibs:
 	dh_makeshlibs -plibkafs0-heimdal -- -c4
 	dh_makeshlibs -plibgssapi3-heimdal -- -c4
 	dh_makeshlibs -plibotp0-heimdal -- -c4
-	dh_makeshlibs -plibkdc2-heimdal -V"libkdc2-heimdal (>= 1.4.0~git20110226.dfsg.2-1)" -- -c4
-	dh_makeshlibs -plibasn1-8-heimdal -V"libasn1-8-heimdal (>= 1.4.0~git20110226.dfsg.2-1)" -- -c4
-	dh_makeshlibs -plibheimbase1-heimdal -V"libheimbase1-heimdal (>= 1.4.0~git20110226.dfsg.2-1)" -- -c4
-	dh_makeshlibs -plibhcrypto4-heimdal -V"libhcrypto4-heimdal (>= 1.4.0~git20110226.dfsg.2-1)" -- -c4
-	dh_makeshlibs -plibhdb9-heimdal -V"libhdb9-heimdal (>= 1.4.0~git20110226.dfsg.2-1)" -- -c4
-	dh_makeshlibs -plibhx509-5-heimdal -V"libhx509-5-heimdal (>= 1.4.0~git20110226.dfsg.2-1)" -- -c4
-	dh_makeshlibs -plibkadm5srv8-heimdal -V"libkadm5srv8-heimdal (>= 1.4.0~git20110226.dfsg.2-1)" -- -c4
-	dh_makeshlibs -plibkadm5clnt7-heimdal -V"libkadm5clnt7-heimdal (>= 1.6~rc2+dfsg)" -- -c4
-	dh_makeshlibs -plibkrb5-26-heimdal -V"libkrb5-26-heimdal (>= 1.4.0~git20110226.dfsg.2-1)" -- -c4
-	dh_makeshlibs -plibheimntlm0-heimdal -V"libheimntlm0-heimdal (>= 1.4.0~git20110226.dfsg.2-1)" -- -c4
-	dh_makeshlibs -plibroken18-heimdal -V"libroken18-heimdal (>= 1.4.0~git20110226.dfsg.2-1)" -- -c4
-	dh_makeshlibs -plibwind0-heimdal -V"libwind0-heimdal (>= 1.4.0~git20110226.dfsg.1-1)" -- -c4
+	dh_makeshlibs -plibkdc2-heimdal -- -c4
+	dh_makeshlibs -plibasn1-8-heimdal -- -c4
+	dh_makeshlibs -plibheimbase1-heimdal -- -c4
+	dh_makeshlibs -plibhcrypto5-heimdal -- -c4
+	dh_makeshlibs -plibhdb9-heimdal -- -c4
+	dh_makeshlibs -plibhx509-5-heimdal -- -c4
+	dh_makeshlibs -plibkadm5srv8-heimdal -- -c4
+	dh_makeshlibs -plibkadm5clnt7-heimdal -- -c4
+	dh_makeshlibs -plibkrb5-26-heimdal -- -c4
+	dh_makeshlibs -plibheimntlm0-heimdal -- -c4
+	dh_makeshlibs -plibroken19-heimdal -- -c4
+	dh_makeshlibs -plibwind0-heimdal -- -c4
 
 override_dh_auto_test:
 	# The testsuite fails when run with parallel jobs
@@ -36,6 +36,7 @@ override_dh_auto_test:
 
 override_dh_auto_configure:
 	./configure $(shell dpkg-buildflags --export=configure) \
+	  --disable-silent-rules \
 	  --libexecdir="\$${prefix}/sbin" \
 	  --enable-shared \
 	  --prefix=/usr \
@@ -53,9 +54,10 @@ override_dh_auto_configure:
 
 DESTDIR = $(CURDIR)/debian/tmp
 
-overide_dh_fixperms:
+override_dh_fixperms:
 	dh_fixperms
 	# /var/lib/heimdal-kdc is 700
+	/bin/mkdir -p debian/heimdal-kdc/var/lib/heimdal-kdc
 	chmod 700 debian/heimdal-kdc/var/lib/heimdal-kdc
 
 override_dh_auto_clean::
@@ -82,8 +84,9 @@ override_dh_auto_install:
 		  $(DESTDIR)/usr/share/man/man1/bsearch.1 \
 		  $(DESTDIR)/usr/share/man/man1/idn-lookup.1
 	# remove unwanted files
-	rm -f $(DESTDIR)/usr/lib/$(DEB_HOST_MULTIARCH)/windc.so*
-	rm -f $(DESTDIR)/usr/lib/$(DEB_HOST_MULTIARCH)/windc.a
+	rm debian/heimdal-multidev/usr/lib/$(DEB_HOST_MULTIARCH)/heimdal/windc.so
+	rm debian/heimdal-multidev/usr/lib/$(DEB_HOST_MULTIARCH)/heimdal/windc.a
+	rm $(DESTDIR)/usr/lib/$(DEB_HOST_MULTIARCH)/windc.so*
 
 override_dh_install-indep:
 	dh_install --sourcedir=$(DESTDIR) --list-missing --fail-missing

@@ -22,7 +22,7 @@ index 4caf752..1d620ce 100644
  @smallexample
  principal       [priv1,priv2,...]       [glob-pattern]
 diff --git a/kdc/kdc.8 b/kdc/kdc.8
-index 70c4caf..bdf7073 100644
+index 26f7750..443a155 100644
 --- a/kdc/kdc.8
 +++ b/kdc/kdc.8
 @@ -70,7 +70,7 @@ Options supported:

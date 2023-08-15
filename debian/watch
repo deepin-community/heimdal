@@ -1,4 +1,5 @@
 version=4
-opts=repack,repacksuffix=+dfsg,dversionmangle=s/\+dfsg\d*$//,uversionmangle=s/(pre\d|rc\d)/~$1/ \
-  https://github.com/heimdal/heimdal/releases /heimdal/heimdal/releases/download/heimdal-.*/heimdal-(.+).tar.gz \
+opts="mode=git,repack,repacksuffix=+dfsg,dversionmangle=s/\+dfsg\d*$//,pretty=7.8.git%cd.%h" \
+  https://github.com/heimdal/heimdal \
+  heads/heimdal-7-1-branch \
   debian debian/repack-heimdal.sh

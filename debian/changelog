@@ -1,8 +1,101 @@
-heimdal (7.7.0+dfsg-3) UNRELEASED; urgency=medium
+heimdal (7.8.git20221117.28daf24+dfsg-3) unstable; urgency=medium
 
-  * update
+  * Fix random "Ticket expired" and "Clock skew too great" errors by setting
+    kdc_offset correctly. Closes: #1039992.
 
- -- Brian May <bam@debian.org>  Mon, 06 Jun 2022 17:03:31 +0800
+ -- Brian May <bam@debian.org>  Tue, 04 Jul 2023 10:09:56 +1000
+
+heimdal (7.8.git20221117.28daf24+dfsg-2) unstable; urgency=medium
+
+  * Fix incorrect license of Debian files.
+  * Fix deprecated dependancies.
+  * gsskrb5: fix accidental logic inversions (CVE-2022-45142)
+    (Closes: #1030849) - change applied from NMU version
+    7.8.git20221117.28daf24+dfsg-1.1
+  * Add ro.po file. Closes: #1031897.
+
+ -- Brian May <bam@debian.org>  Sat, 25 Feb 2023 09:32:57 +1100
+
+heimdal (7.8.git20221117.28daf24+dfsg-1) unstable; urgency=medium
+
+  * New upstream release.
+
+ -- Brian May <bam@debian.org>  Sat, 10 Dec 2022 16:29:20 +1100
+
+heimdal (7.8.git20221115.a6cf945+dfsg-3) unstable; urgency=medium
+
+  * Source-only upload to enable migration to testingi (2nd attempt).
+
+ -- Brian May <bam@debian.org>  Sun, 04 Dec 2022 09:56:06 +1100
+
+heimdal (7.8.git20221115.a6cf945+dfsg-2) unstable; urgency=medium
+
+  * Source-only upload to enable migration to testing.
+
+ -- Brian May <bam@debian.org>  Sun, 04 Dec 2022 09:09:44 +1100
+
+heimdal (7.8.git20221115.a6cf945+dfsg-1) unstable; urgency=medium
+
+  * New upstream version.
+  * Numerous security fixes (Closes: #1024187).
+  * asn1: Invalid free in ASN.1 codec (CVE-2022-44640)
+  * krb5: PAC parse integer overflows (CVE-2022-42898)
+  * gsskrb5: Use constant-time memcmp() for arcfour unwrap (CVE-2022-3437)
+  * gsskrb5: Use constant-time memcmp() in unwrap_des3() (CVE-2022-3437)
+  * gsskrb5: Don't pass NULL pointers to memcpy() in DES unwrap
+    (CVE-2022-3437)
+  * gsskrb5: Avoid undefined behaviour in _gssapi_verify_pad()
+    (CVE-2022-3437)
+  * gsskrb5: Check the result of _gsskrb5_get_mech() (CVE-2022-3437)
+  * gsskrb5: Check buffer length against overflow for DES{,3} unwrap
+    (CVE-2022-3437)
+  * gsskrb5: Check for overflow in _gsskrb5_get_mech() (CVE-2022-3437)
+  * gsskrb5: Pass correct length to _gssapi_verify_pad() (CVE-2022-3437)
+  * libhx509: Fix denial of service vulnerability (CVE-2022-41916)
+  * spnego: send_reject when no mech selected (CVE-2021-44758)
+  * Fix regression in _krb5_get_int64 on 32 bit systems.
+    https://github.com/heimdal/heimdal/pull/1025
+  * Increment soname for libroken.
+  * Increment soname for libhcrypto.
+  * Remove legacy shared library version requirements.
+  * Add symbols to libkadm5srv8.
+
+ -- Brian May <bam@debian.org>  Sun, 27 Nov 2022 10:44:26 +1100
+
+heimdal (7.7.0+dfsg-6) unstable; urgency=medium
+
+  * Retry deleting dangling windc.so again. Closes: #857215.
+  * Create /var/lib/heimdal-kdc/m-key not /var/lib/heimdal-kdc/heimdal.mkey.
+    Closes: #964008.
+  * Disable use of -rpath in krb5-config.heimdal. Closes: #868840.
+
+ -- Brian May <bam@debian.org>  Mon, 05 Sep 2022 08:35:33 +1000
+
+heimdal (7.7.0+dfsg-5) unstable; urgency=medium
+
+  * Fix missing closefrom symbol. Closes: #1016884, #1017244.
+  * Fix spelling of dependency in changelog.
+  * Fix override_dh_fixperms typo, use 700 for /var/lib/heimdal-kdc/
+  * Remove default --parallel from dh call.
+  * Remove unused debian/upstream/signing-key.asc key.
+  * Fix Multi-Arch headers. heimdal-multidev is not co-installable, so
+    heimdal-dev cannot be co-installable either.
+
+ -- Brian May <bam@debian.org>  Fri, 02 Sep 2022 07:59:59 +1000
+
+heimdal (7.7.0+dfsg-4) unstable; urgency=medium
+
+  * Delete dependency on install-info. Closes: #1013735.
+  * Non-maintainer upload.
+  * Reduce Build-Depends: (Closes: #980531)
+    + Drop unused libhesiod-dev.
+    + Drop unused libperl4-corelibs-perl as cf/make-proto.pl no longer uses
+      it.
+    + Drop unused libx11-dev, libxau-dev, libxt-dev, ss-dev, and
+      x11proto-core-dev.
+    + Clean generated C tables to actually rebuild them using python3.
+
+ -- Brian May <bam@debian.org>  Mon, 27 Jun 2022 10:36:10 +1000
 
 heimdal (7.7.0+dfsg-3) unstable; urgency=high
 
@@ -808,7 +901,7 @@ heimdal (1.3.1.dfsg.1-5) unstable; urgency=low
 
 heimdal (1.3.1.dfsg.1-4) unstable; urgency=low
 
-  * heimdal-dev: remove dependancy on heimsqlite library.
+  * heimdal-dev: remove dependency on heimsqlite library.
   * heimdal-dev: remove symlinks to heimsqlite library.
   * Build against libedit-dev that comes with Debian (closes: #559910).
 
@@ -1463,7 +1556,7 @@ heimdal (0.6-4) unstable; urgency=low
   * Upgrade to DH_COMPAT version 4.
   * Fix minor errors reported by linda, including:
     * Remove call to dh_suidregister.
-    * Add versioned dependancy on debhelper (closes: #216290).
+    * Add versioned dependency on debhelper (closes: #216290).
     * Add versioned depends on debconf,
   * When START_KDC is set, the init.d script should stop kdc; when
     START_KPASSWDD is set, the init.d script should stop kpasswdd; not the
@@ -1591,7 +1684,7 @@ heimdal (0.5.1-4) unstable; urgency=low
   * Rebuild for sid.
   * 016_openssl patch to work with openssl 0.9.7.
   * Now builds on sid (closes: #178775).
-  * New build will have correct dependancy on libroken (closes: #177250).
+  * New build will have correct dependency on libroken (closes: #177250).
 
  -- Brian May <bam@debian.org>  Thu, 30 Jan 2003 11:35:44 +1100
 
@@ -1604,7 +1697,7 @@ heimdal (0.5.1-3) unstable; urgency=low
 
 heimdal (0.5.1-2) unstable; urgency=low
 
-  * Move dependancy on krb5-config to heimdal-servers and heimdal-
+  * Move dependency on krb5-config to heimdal-servers and heimdal-
     clients (closes: #171868).
   * Add build depends on libhesiod-dev, it is only small, and
     all versions of Heimdal need to be built the same.
@@ -1811,7 +1904,7 @@ heimdal (0.3e-6) unstable; urgency=low
 
   * heimdal-dev no longer conflicts with kerberos4kth-dev.
   * build conflicts with heimdal-dev, due to libtool hack.
-  * remove build dependancy on kerberos4kth-dev, as it is not
+  * remove build dependency on kerberos4kth-dev, as it is not
     yet used.
   * remove kafs.h and kafs.3.gz is these conflict with files from
     kerberos4kth.
@@ -1820,7 +1913,7 @@ heimdal (0.3e-6) unstable; urgency=low
 
 heimdal (0.3e-5) unstable; urgency=low
 
-  * Fix library dependancy problem on libdb.
+  * Fix library dependency problem on libdb.
   * Use libtool 1.4. Other packages should link -lkrb5 or -lgssapi,
     and none of the other libraries (unless really required).
   * Split libraries apart.
@@ -2069,9 +2162,9 @@ heimdal (0.2q-1) unstable; urgency=low
   * Looking through the upstream Changelog, I cannot see any changes
   that might break functionality that wasn't already broken.
   * Fix problem with debconf script (closes: #58011).
-  * Change ftp dependancy to ftp-server (closes: #58118).
+  * Change ftp dependency to ftp-server (closes: #58118).
   * Replaced power-pc fix with patch from upstream.
-  * Fixed shlibs dependancy information - all executables will now
+  * Fixed shlibs dependency information - all executables will now
   depend on *this* upstream version of heimdal-lib. This is currently
   a hacked solution to allow clean (future) upgrades.
   * Moved README.Debian to heimdal-docs.
