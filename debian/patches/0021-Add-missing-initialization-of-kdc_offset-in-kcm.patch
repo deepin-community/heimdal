@@ -1,0 +1,33 @@
+From: Pavel Semerad <semeradp@gmail.com>
+Date: Mon, 16 Jul 2018 18:28:55 +0200
+Subject: Add missing initialization of kdc_offset in kcm
+
+In KCM, when allocating new kcm_ccache struct, there is missing inicialization
+of kdc_offset.  It is getting random values in my case and stored tickets are
+unusable, last time I got this value to "klist -v": KDC time offset: 61 years
+11 months 2 weeks 3 days 5 hours 28 minutes 32 seconds This commit seems to
+correct it.
+---
+ kcm/cache.c | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/kcm/cache.c b/kcm/cache.c
+index 25b84ab..02624df 100644
+--- a/kcm/cache.c
++++ b/kcm/cache.c
+@@ -217,6 +217,7 @@ kcm_free_ccache_data_internal(krb5_context context,
+ 
+     cache->tkt_life = 0;
+     cache->renew_life = 0;
++    cache->kdc_offset = 0;
+ 
+     cache->next = NULL;
+     cache->refcnt = 0;
+@@ -322,6 +323,7 @@ kcm_ccache_alloc(krb5_context context,
+     slot->key.keytab = NULL;
+     slot->tkt_life = 0;
+     slot->renew_life = 0;
++    slot->kdc_offset = 0;
+ 
+     if (new_slot)
+ 	ccache_head = slot;

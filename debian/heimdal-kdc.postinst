@@ -73,9 +73,9 @@ then
         cp -a /usr/share/heimdal-kdc/kadmind.acl "$DST"
 
         if [ -z "$PASSWORD" ]; then
-            kstash -k /var/lib/heimdal-kdc/heimdal.mkey --random-key
+            kstash -k /var/lib/heimdal-kdc/m-key --random-key
         else
-            kstash -k /var/lib/heimdal-kdc/heimdal.mkey --master-key-fd=0 <<EOF
+            kstash -k /var/lib/heimdal-kdc/m-key --master-key-fd=0 <<EOF
 $PASSWORD
 EOF
         fi
