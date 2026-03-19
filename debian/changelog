@@ -1,3 +1,9 @@
+heimdal (7.8.git20221117.28daf24+dfsg-3deepin1) unstable; urgency=medium
+
+  * update debian patch.
+
+ -- lichenggang <lichenggang@deepin.org>  Thu, 19 Mar 2026 13:53:07 +0800
+
 heimdal (7.8.git20221117.28daf24+dfsg-3) unstable; urgency=medium
 
   * Fix random "Ticket expired" and "Clock skew too great" errors by setting

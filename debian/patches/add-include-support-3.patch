@@ -1,0 +1,40 @@
+From: Brian May <bam@debian.org>
+Date: Thu, 8 Aug 2024 10:43:18 +1000
+Subject: add-include-support-3
+
+commit 23ee804e9d23ed83a3a502501dbe5fe50ab9094a
+Author: Jeffrey Altman <jaltman@secure-endpoints.com>
+Date:   Sat Mar 18 11:06:45 2017 -0400
+
+    lib/krb5: krb5_config_parse_file_multi use after free
+    
+    If the file is not a regular file, the 'fname' buffer will be freed
+    before it is passed to the krb5_set_error_message() routine.  That
+    this is true is not obvious from code inspection but 'newfname'
+    and 'fname' refer to the same memory.
+    
+    Change-Id: I7780eae9ceaf01b245df488a2f7d7f406770864f
+
+Origin: upstream, https://github.com/heimdal/heimdal/commit/23ee804e9d23ed83a3a502501dbe5fe50ab9094a
+Bug-Debian: https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=1074775
+Bug-Ubuntu: https://bugs.launchpad.net/ubuntu/+source/heimdal/+bug/2037321
+Last-Update: 2024-07-05
+---
+ lib/krb5/config_file.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/lib/krb5/config_file.c b/lib/krb5/config_file.c
+index 947c302..e1754f0 100644
+--- a/lib/krb5/config_file.c
++++ b/lib/krb5/config_file.c
+@@ -661,9 +661,9 @@ krb5_config_parse_file_multi (krb5_context context,
+         if (!S_ISREG(st.st_mode)) {
+             (void) fclose(f.f);
+             context->config_include_depth--;
+-            free(newfname);
+ 	    krb5_set_error_message(context, EISDIR, "not a regular file %s: %s",
+ 				   fname, strerror(EISDIR));
++	    free(newfname);
+ 	    return EISDIR;
+         }
+ 

@@ -1,0 +1,25 @@
+From: Florian Weimer <fweimer@redhat.com>
+Date: Thu, 13 Apr 2023 13:13:59 +0200
+Subject: cf: Include <string.h> for memset in AC_HAVE_STRUCT_FIELD
+
+Otherwise, the check relies on an implicit function declaration,
+and will fail unconditionally with compilers that do not support
+them.
+---
+ cf/have-struct-field.m4 | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/cf/have-struct-field.m4 b/cf/have-struct-field.m4
+index bb7bcef..3962d85 100644
+--- a/cf/have-struct-field.m4
++++ b/cf/have-struct-field.m4
+@@ -7,7 +7,8 @@ dnl AC_HAVE_STRUCT_FIELD(struct, field, headers)
+ AC_DEFUN([AC_HAVE_STRUCT_FIELD], [
+ define(cache_val, translit(ac_cv_type_$1_$2, [A-Z ], [a-z_]))
+ AC_CACHE_CHECK([for $2 in $1], cache_val,[
+-AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[$3]],
++AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[#include <string.h>
++$3]],
+ 	[[$1 x; memset(&x, 0, sizeof(x)); x.$2]])],
+ 	[cache_val=yes],
+ 	[cache_val=no])

@@ -1,0 +1,37 @@
+From: Brian May <bam@debian.org>
+Date: Thu, 8 Aug 2024 10:43:18 +1000
+Subject: add-include-support-4
+
+commit 96641e12ba61806201f420fe880888047ebd5402
+Author: Nicolas Williams <nico@twosigma.com>
+Date:   Fri Mar 10 15:40:26 2017 -0600
+
+    Canonicalize $srcdir in configure.ac
+    
+    For krb5.conf include/includedir we want to reject non-absolute paths,
+    but then we need to make sure that we use absolute paths in the tests,
+    otherwise they fail.  Of course ./configure has been defaulting to
+    relative paths for $srcdir and $objdir.  This commit canonicalizes
+    $srcdir; eventually, no doubt, we'll have to canonicalize $objdir too.
+
+Origin: upstream, https://github.com/heimdal/heimdal/commit/96641e12ba61806201f420fe880888047ebd5402
+Bug-Debian: https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=1074775
+Bug-Ubuntu: https://bugs.launchpad.net/ubuntu/+source/heimdal/+bug/2037321
+Last-Update: 2024-07-05
+---
+ configure.ac | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/configure.ac b/configure.ac
+index c95cd9d..360c447 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -7,6 +7,8 @@ AC_CONFIG_SRCDIR([kuser/kinit.c])
+ AC_CONFIG_HEADERS(include/config.h)
+ AC_CONFIG_MACRO_DIR([cf])
+ 
++srcdir=`cd "$srcdir" && pwd || echo "$srcdir"`
++
+ AM_INIT_AUTOMAKE([foreign 1.11])
+ AM_MAINTAINER_MODE
+ 
