@@ -1,3 +1,9 @@
+heimdal (7.8.git20221117.28daf24+dfsg-11deepin1) unstable; urgency=medium
+
+  * revert 64-bit time_t transition.
+
+ -- lichenggang <lichenggang@deepin.org>  Thu, 19 Mar 2026 17:25:16 +0800
+
 heimdal (7.8.git20221117.28daf24+dfsg-11) unstable; urgency=medium
 
   * Fix memory leak in heimdal-clients by applying upstream patch from
