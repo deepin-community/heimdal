@@ -1,0 +1,349 @@
+From: Brian May <bam@debian.org>
+Date: Thu, 8 Aug 2024 10:43:18 +1000
+Subject: add-include-support-1
+
+commit fe43be85587f834266623adb0ecf2793d212a7ca
+Author: Nicolas Williams <nico@twosigma.com>
+Date:   Thu Feb 16 11:49:05 2017 -0600
+
+    Add include/includedir directives for krb5.conf
+
+Origin: upstream, https://github.com/heimdal/heimdal/commit/fe43be85587f834266623adb0ecf2793d212a7ca
+Bug-Debian: https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=1074775
+Bug-Ubuntu: https://bugs.launchpad.net/ubuntu/+source/heimdal/+bug/2037321
+Last-Update: 2024-07-01
+---
+ doc/setup.texi              |   7 ++++
+ lib/krb5/config_file.c      | 100 ++++++++++++++++++++++++++++++++++++++++++--
+ lib/krb5/krb5.conf.5        |  13 ++++++
+ lib/krb5/krb5_locl.h        |   1 +
+ tests/gss/include-krb5.conf |  17 ++++++++
+ tests/gss/krb5.conf.in      |  17 +-------
+ 6 files changed, 136 insertions(+), 19 deletions(-)
+ create mode 100644 tests/gss/include-krb5.conf
+
+diff --git a/doc/setup.texi b/doc/setup.texi
+index 1d620ce..f02dd2e 100644
+--- a/doc/setup.texi
++++ b/doc/setup.texi
+@@ -52,7 +52,14 @@ separated from the equal sign with some whitespace). Subsections have a
+ other bindings are treated as variable assignments. The value of a
+ variable extends to the end of the line.
+ 
++Configuration files can also include other files, or all files in a
++directory.  Use absolute paths in include directives.  When including a
++directoty, only files whose names consist of alphanumeric, hyphen, or
++underscore characters are allowed, though they may end in '.conf'.
++
+ @example
++include /some/config/file
++includedir /some/config/directory
+ [section1]
+         a-subsection = @{
+                 var = value1
+diff --git a/lib/krb5/config_file.c b/lib/krb5/config_file.c
+index 6293bd7..3c4b0b6 100644
+--- a/lib/krb5/config_file.c
++++ b/lib/krb5/config_file.c
+@@ -41,6 +41,7 @@
+ 
+ /* Gaah! I want a portable funopen */
+ struct fileptr {
++    krb5_context context;
+     const char *s;
+     FILE *f;
+ };
+@@ -366,7 +367,7 @@ krb5_config_parse_debug (struct fileptr *f,
+ 	    ++p;
+ 	if (*p == '#' || *p == ';')
+ 	    continue;
+-	if (*p == '[') {
++        if (*p == '[') {
+ 	    ret = parse_section(p, &s, res, err_message);
+ 	    if (ret)
+ 		return ret;
+@@ -374,6 +375,22 @@ krb5_config_parse_debug (struct fileptr *f,
+ 	} else if (*p == '}') {
+ 	    *err_message = "unmatched }";
+ 	    return KRB5_CONFIG_BADFORMAT;
++        } else if (strncmp(p, "include", sizeof("include") - 1) == 0 &&
++            isspace(p[sizeof("include") - 1])) {
++            p += sizeof("include");
++            while (isspace(*p))
++                p++;
++            ret = krb5_config_parse_file_multi(f->context, p, res);
++	    if (ret)
++		return ret;
++        } else if (strncmp(p, "includedir", sizeof("includedir") - 1) == 0 &&
++            isspace(p[sizeof("includedir") - 1])) {
++            p += sizeof("includedir");
++            while (isspace(*p))
++                p++;
++            ret = krb5_config_parse_dir_multi(f->context, p, res);
++	    if (ret)
++		return ret;
+ 	} else if(*p != '\0') {
+ 	    if (s == NULL) {
+ 		*err_message = "binding before section";
+@@ -399,6 +416,64 @@ is_plist_file(const char *fname)
+     return 1;
+ }
+ 
++/**
++ * Parse configuration files in the given directory and add the result
++ * into res.  Only files whose names consist only of alphanumeric
++ * characters, hyphen, and underscore, will be parsed, though files
++ * ending in ".conf" will also be parsed.
++ *
++ * This interface can be used to parse several configuration directories
++ * into one resulting krb5_config_section by calling it repeatably.
++ *
++ * @param context a Kerberos 5 context.
++ * @param dname a directory name to a Kerberos configuration file
++ * @param res the returned result, must be free with krb5_free_config_files().
++ * @return Return an error code or 0, see krb5_get_error_message().
++ *
++ * @ingroup krb5_support
++ */
++
++KRB5_LIB_FUNCTION krb5_error_code KRB5_LIB_CALL
++krb5_config_parse_dir_multi(krb5_context context,
++                            const char *dname,
++                            krb5_config_section **res)
++{
++    struct dirent *entry;
++    krb5_error_code ret;
++    DIR *d;
++
++    if ((d = opendir(dname)) == NULL)
++        return errno;
++
++    while ((entry = readdir(d)) != NULL) {
++        char *p = entry->d_name;
++        char *path;
++        int is_valid = 1;
++
++        while (*p) {
++            if (!isalpha(*p) && *p != '_' && *p != '-' &&
++                strcmp(p, ".conf") != 0) {
++                is_valid = 0;
++                break;
++            }
++            p++;
++        }
++        if (!is_valid)
++            continue;
++
++        if (asprintf(&path, "%s/%s", dname, entry->d_name) == -1 ||
++            path == NULL)
++            return krb5_enomem(context);
++        ret = krb5_config_parse_file_multi(context, path, res);
++        free(path);
++        if (ret == ENOMEM)
++            return krb5_enomem(context);;
++        /* Ignore malformed config files */
++    }
++    (void) closedir(d);
++    return 0;
++}
++
+ /**
+  * Parse a configuration file and add the result into res. This
+  * interface can be used to parse several configuration files into one
+@@ -423,6 +498,13 @@ krb5_config_parse_file_multi (krb5_context context,
+     krb5_error_code ret;
+     struct fileptr f;
+ 
++    if (context->config_include_depth > 5) {
++        krb5_warnx(context, "Maximum config file include depth reached; "
++                   "not including %s", fname);
++        return 0;
++    }
++    context->config_include_depth++;
++
+     /**
+      * If the fname starts with "~/" parse configuration file in the
+      * current users home directory. The behavior can be disabled and
+@@ -433,6 +515,7 @@ krb5_config_parse_file_multi (krb5_context context,
+ 	const char *home = NULL;
+ 
+ 	if (!_krb5_homedir_access(context)) {
++            context->config_include_depth--;
+ 	    krb5_set_error_message(context, EPERM,
+ 				   "Access to home directory not allowed");
+ 	    return EPERM;
+@@ -450,14 +533,18 @@ krb5_config_parse_file_multi (krb5_context context,
+ 	    int aret;
+ 
+ 	    aret = asprintf(&newfname, "%s%s", home, &fname[1]);
+-	    if (aret == -1 || newfname == NULL)
++	    if (aret == -1 || newfname == NULL) {
++                context->config_include_depth--;
+ 		return krb5_enomem(context);
++            }
+ 	    fname = newfname;
+ 	}
+ #else  /* KRB5_USE_PATH_TOKENS */
+ 	if (asprintf(&newfname, "%%{USERCONFIG}%s", &fname[1]) < 0 ||
+-	    newfname == NULL)
++	    newfname == NULL) {
++            context->config_include_depth--;
+ 	    return krb5_enomem(context);
++        }
+ 	fname = newfname;
+ #endif
+     }
+@@ -465,6 +552,7 @@ krb5_config_parse_file_multi (krb5_context context,
+     if (is_plist_file(fname)) {
+ #ifdef __APPLE__
+ 	ret = parse_plist_config(context, fname, res);
++        context->config_include_depth--;
+ 	if (ret) {
+ 	    krb5_set_error_message(context, ret,
+ 				   "Failed to parse plist %s", fname);
+@@ -483,6 +571,7 @@ krb5_config_parse_file_multi (krb5_context context,
+ 
+ 	ret = _krb5_expand_path_tokens(context, fname, 1, &exp_fname);
+ 	if (ret) {
++            context->config_include_depth--;
+ 	    if (newfname)
+ 		free(newfname);
+ 	    return ret;
+@@ -493,9 +582,11 @@ krb5_config_parse_file_multi (krb5_context context,
+ 	fname = newfname = exp_fname;
+ #endif
+ 
++        f.context = context;
+ 	f.f = fopen(fname, "r");
+ 	f.s = NULL;
+ 	if(f.f == NULL) {
++            context->config_include_depth--;
+ 	    ret = errno;
+ 	    krb5_set_error_message (context, ret, "open %s: %s",
+ 				    fname, strerror(ret));
+@@ -505,6 +596,7 @@ krb5_config_parse_file_multi (krb5_context context,
+ 	}
+ 
+ 	ret = krb5_config_parse_debug (&f, res, &lineno, &str);
++        context->config_include_depth--;
+ 	fclose(f.f);
+ 	if (ret) {
+ 	    krb5_set_error_message (context, ret, "%s:%u: %s",
+@@ -1312,6 +1404,8 @@ krb5_config_parse_string_multi(krb5_context context,
+     unsigned lineno = 0;
+     krb5_error_code ret;
+     struct fileptr f;
++
++    f.context = context;
+     f.f = NULL;
+     f.s = string;
+ 
+diff --git a/lib/krb5/krb5.conf.5 b/lib/krb5/krb5.conf.5
+index 8a0f084..63ee8cf 100644
+--- a/lib/krb5/krb5.conf.5
++++ b/lib/krb5/krb5.conf.5
+@@ -54,6 +54,7 @@ The grammar looks like:
+ file:
+ 	/* empty */
+ 	sections
++        includes
+ 
+ sections:
+ 	section sections
+@@ -76,10 +77,22 @@ binding:
+ name:
+ 	STRING
+ 
++includes:
++	'include' path
++	'includedir' path
++
++path: STRING
++
+ .Ed
+ .Li STRINGs
+ consists of one or more non-whitespace characters.
+ .Pp
++Files and directories may be included by absolute path.  Including a
++directory causes all files in the directory to be included as if each
++file had been included separately, but only files whose names consist of
++alphanumeric, hyphen, and underscore are included, though they may also
++end in '.conf'.
++.Pp
+ STRINGs that are specified later in this man-page uses the following
+ notation.
+ .Bl -tag -width "xxx" -offset indent
+diff --git a/lib/krb5/krb5_locl.h b/lib/krb5/krb5_locl.h
+index b64f3a9..3a388bd 100644
+--- a/lib/krb5/krb5_locl.h
++++ b/lib/krb5/krb5_locl.h
+@@ -233,6 +233,7 @@ typedef struct krb5_context_data {
+     int32_t kdc_sec_offset;
+     int32_t kdc_usec_offset;
+     krb5_config_section *cf;
++    size_t config_include_depth;
+     struct et_list *et_list;
+     struct krb5_log_facility *warn_dest;
+     struct krb5_log_facility *debug_dest;
+diff --git a/tests/gss/include-krb5.conf b/tests/gss/include-krb5.conf
+new file mode 100644
+index 0000000..ae21e9e
+--- /dev/null
++++ b/tests/gss/include-krb5.conf
+@@ -0,0 +1,17 @@
++[libdefaults]
++	default_realm = TEST.H5L.SE
++	no-addresses = TRUE
++	dns_canonicalize_hostname = false
++	dns_lookup_realm = false
++	name_canon_rules = as-is:realm=TEST.H5L.SE
++	name_canon_rules = qualify:domain=test.h5l.se
++
++[domain_realms]
++	.test.h5l.se = TEST.H5L.SE
++
++[kdc]
++	enable-digest = true
++	digests_allowed = ntlm-v2,ntlm-v1-session,ntlm-v1
++
++[kadmin]
++	save-password = true
+diff --git a/tests/gss/krb5.conf.in b/tests/gss/krb5.conf.in
+index d372c9a..d6b9a06 100644
+--- a/tests/gss/krb5.conf.in
++++ b/tests/gss/krb5.conf.in
+@@ -1,26 +1,14 @@
+-# $Id$
++include @srcdir@/include-krb5.conf
+ 
+ [libdefaults]
+-	default_realm = TEST.H5L.SE
+-	no-addresses = TRUE
+ 	default_keytab_name = @objdir@/server.keytab
+-	dns_canonicalize_hostname = false
+-	dns_lookup_realm = false
+-	name_canon_rules = as-is:realm=TEST.H5L.SE
+-	name_canon_rules = qualify:domain=test.h5l.se
+ 
+ [realms]
+ 	TEST.H5L.SE = {
+ 		kdc = localhost:@port@
+ 	}
+ 
+-[domain_realms]
+-	.test.h5l.se = TEST.H5L.SE
+-
+ [kdc]
+-	enable-digest = true
+-	digests_allowed = ntlm-v2,ntlm-v1-session,ntlm-v1
+-
+ 	database = {
+ 		dbname = @objdir@/current-db
+ 		realm = TEST.H5L.SE
+@@ -34,6 +22,3 @@
+ [logging]
+ 	kdc = 0-/FILE:@objdir@/messages.log
+ 	default = 0-/FILE:@objdir@/messages.log
+-
+-[kadmin]
+-	save-password = true

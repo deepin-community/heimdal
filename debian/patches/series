@@ -19,3 +19,12 @@ fix-missing-headers
 0019-Increment-hcrypto-library-version.patch
 CVE-2022-45142-gsskrb5-fix-accidental-logic-inversio.patch
 0021-Add-missing-initialization-of-kdc_offset-in-kcm.patch
+0022-Always-build-rk_strlcat-and-rk_strlcpy-symbols.patch
+0023-cf-Include-string.h-for-memset-in-AC_HAVE_STRUCT_FIE.patch
+0024-cf-Do-not-use-headers-and-argument-lists-in-AC_FIND_.patch
+add-include-support-1.patch
+add-include-support-2.patch
+add-include-support-3.patch
+add-include-support-4.patch
+fix-build-with-autoconf-272.patch
+0030-krb5-not_found-must-free-krb5_get_error_message-stri.patch

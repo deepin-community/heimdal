@@ -1,0 +1,81 @@
+#!/bin/sh
+
+set -e
+
+TEST_REALM="EXAMPLE.INTERNAL"
+
+mkdir -p /etc/krb5.conf.d
+if ! grep -q includedir /etc/krb5.conf; then
+    echo "## Adding includedir directive to /etc/krb5.conf"
+    sed -r -i '1 i\includedir /etc/krb5.conf.d\n' /etc/krb5.conf
+fi
+
+echo
+echo "## Creating /etc/krb5.conf.d/autopkgtest.conf"
+cat > /etc/krb5.conf.d/autopkgtest.conf <<EOF
+[libdefaults]
+    default_realm = ${TEST_REALM}
+
+[realms]
+    ${TEST_REALM} = {
+        kdc = localhost
+        admin_server = localhost
+    }
+EOF
+
+echo
+echo "## Stoping heimdal-kdc.service and cleaning up DB directory"
+systemctl stop heimdal-kdc.service
+
+# leave symlink to /etc/heimdal-kdc/kdc.conf
+rm -f /var/lib/heimdal-kdc/{heimdal.db,log,m-key} || :
+
+echo
+echo "## Stashing key"
+kstash --random-key
+
+echo
+echo "## Initializing realm ${TEST_REALM}"
+kadmin -l init \
+    --realm-max-ticket-life=unlimited \
+    --realm-max-renewable-life=unlimited \
+    "${TEST_REALM}"
+
+echo
+echo "## Starting heimdal-kdc.service"
+systemctl start heimdal-kdc.service
+
+# create a random-enough principal
+principal="testuser$$"
+password="password$$"
+echo
+echo "## Creating test principal named ${principal}"
+kadmin -l add \
+    --password="${password}" \
+    --max-ticket-life=8h \
+    --max-renewable-life=8h \
+    --expiration-time=never \
+    --pw-expiration-time=never \
+    --attributes="" \
+    --policy=default \
+    "${principal}"
+
+# get a ticket
+echo
+echo "## Getting TGT for principal ${principal}"
+echo "${password}" | kinit --password-file=STDIN "${principal}"
+
+# did we really get a ticket?
+echo
+echo "## Verifying we got a TGT"
+klist | grep krbtgt/${TEST_REALM}@${TEST_REALM}
+
+# destroy it
+echo
+echo "## Destroying ticket"
+kdestroy
+
+# remove the principal
+echo
+echo "## Removing principal ${principal} from the db"
+kadmin -l delete "${principal}"
