@@ -80,7 +80,7 @@ $PASSWORD
 EOF
         fi
 
-        kadmin  -l init --realm-max-ticket-life=unlimited --realm-max-renewable-life=unlimited "$REALM"
+        kadmin.heimdal  -l init --realm-max-ticket-life=unlimited --realm-max-renewable-life=unlimited "$REALM"
 
         touch /etc/heimdal-kdc/.configured
 fi

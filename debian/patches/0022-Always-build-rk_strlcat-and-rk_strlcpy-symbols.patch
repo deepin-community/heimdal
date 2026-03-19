@@ -1,0 +1,31 @@
+From: Brian May <bam@debian.org>
+Date: Fri, 22 Dec 2023 11:45:55 +1100
+Subject: Always build rk_strlcat and rk_strlcpy symbols
+
+---
+ cf/roken-frag.m4 | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
+
+diff --git a/cf/roken-frag.m4 b/cf/roken-frag.m4
+index f1f2dbf..a9d1e1d 100644
+--- a/cf/roken-frag.m4
++++ b/cf/roken-frag.m4
+@@ -371,8 +371,6 @@ AC_BROKEN([					\
+ 	strdup					\
+ 	strerror				\
+ 	strftime				\
+-	strlcat					\
+-	strlcpy					\
+ 	strlwr					\
+ 	strncasecmp				\
+ 	strndup					\
+@@ -398,6 +396,9 @@ AC_BROKEN([					\
+ 	writev					\
+ ])
+ 
++rk_LIBOBJ(strlcpy)
++rk_LIBOBJ(strlcat)
++
+ AM_CONDITIONAL(have_fnmatch_h,
+ 	test "$ac_cv_header_fnmatch_h" = yes -a "$ac_cv_func_fnmatch" = yes)
+ 

@@ -1,3 +1,78 @@
+heimdal (7.8.git20221117.28daf24+dfsg-11) unstable; urgency=medium
+
+  * Fix memory leak in heimdal-clients by applying upstream patch from
+  https://github.com/heimdal/heimdal/commit/739f7e0484e412de7de6d5ef1100fcc20836d19d
+
+ -- Brian May <bam@debian.org>  Thu, 26 Feb 2026 17:37:03 +1100
+
+heimdal (7.8.git20221117.28daf24+dfsg-10) unstable; urgency=medium
+
+  [ Helmut Grohne ]
+  * Explicitly depend on libcrypt-dev. (Closes: #1102912)
+
+ -- Brian May <bam@debian.org>  Sun, 18 Jan 2026 08:59:40 +1100
+
+heimdal (7.8.git20221117.28daf24+dfsg-9) unstable; urgency=medium
+
+  * Use kadmin.heimdal in postinst instead of heimdal. Closes: #1070031.
+
+ -- Brian May <bam@debian.org>  Tue, 04 Mar 2025 10:58:18 +1100
+
+heimdal (7.8.git20221117.28daf24+dfsg-8) unstable; urgency=medium
+
+  [ Andreas Hasenack ]
+  * Fix FTBFS with autoconf 2.72. Closes: #1078494.
+
+ -- Brian May <bam@debian.org>  Mon, 12 Aug 2024 10:55:53 +1000
+
+heimdal (7.8.git20221117.28daf24+dfsg-7) unstable; urgency=medium
+
+  * Add include and includedir patch that was accidentally omitted.
+  * Rename pkg-config to pkgconf in dependancy.
+
+  [ Andreas Hasenack ]
+  * Add support for include and includedir directives to krb5.conf.
+
+ -- Brian May <bam@debian.org>  Thu, 08 Aug 2024 10:42:42 +1000
+
+heimdal (7.8.git20221117.28daf24+dfsg-6) unstable; urgency=medium
+
+  * Fix FTBFS due to not linking with crypt correctly. Applied patch from
+    https://github.com/heimdal/heimdal/pull/1085. Closes: #1075064.
+
+  [ Andreas Hasenack ]
+  * Add a kinit DEP8 test which relies on the includedir support.
+
+ -- Brian May <bam@debian.org>  Thu, 25 Jul 2024 16:19:48 +1000
+
+heimdal (7.8.git20221117.28daf24+dfsg-5) unstable; urgency=medium
+
+  * Apply NMU patches. Closes: #1065373.
+
+ -- Brian May <bam@debian.org>  Sat, 09 Mar 2024 11:01:27 +1100
+
+heimdal (7.8.git20221117.28daf24+dfsg-4.2) unstable; urgency=medium
+
+  [ Matthias Klose ]
+  * Filter-out -Werror=implicit-function-declaration, unconditionally set
+    by abi=time64.
+
+ -- Steve Langasek <vorlon@debian.org>  Fri, 08 Mar 2024 08:21:09 +0000
+
+heimdal (7.8.git20221117.28daf24+dfsg-4.1) unstable; urgency=medium
+
+  * Non-maintainer upload.
+  * Rename libraries for 64-bit time_t transition.  Closes: #1064097
+
+ -- Lukas Märdian <slyon@debian.org>  Wed, 28 Feb 2024 08:36:52 +0000
+
+heimdal (7.8.git20221117.28daf24+dfsg-4) unstable; urgency=medium
+
+  * Always build the rk_strlcat and rk_strlcpy symbols even if included in
+    glibc. Closes: #1055316.
+
+ -- Brian May <bam@debian.org>  Wed, 03 Jan 2024 11:43:58 +1100
+
 heimdal (7.8.git20221117.28daf24+dfsg-3) unstable; urgency=medium
 
   * Fix random "Ticket expired" and "Clock skew too great" errors by setting
