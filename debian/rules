@@ -13,22 +13,22 @@ override_dh_strip:
 	dh_strip --dbgsym-migration="heimdal-dbg (<< 7.5.0~)"
 
 override_dh_makeshlibs:
-	dh_makeshlibs -plibsl0-heimdal -- -c4
-	dh_makeshlibs -plibkafs0-heimdal -- -c4
-	dh_makeshlibs -plibgssapi3-heimdal -- -c4
-	dh_makeshlibs -plibotp0-heimdal -- -c4
-	dh_makeshlibs -plibkdc2-heimdal -- -c4
-	dh_makeshlibs -plibasn1-8-heimdal -- -c4
-	dh_makeshlibs -plibheimbase1-heimdal -- -c4
-	dh_makeshlibs -plibhcrypto5-heimdal -- -c4
-	dh_makeshlibs -plibhdb9-heimdal -- -c4
-	dh_makeshlibs -plibhx509-5-heimdal -- -c4
-	dh_makeshlibs -plibkadm5srv8-heimdal -- -c4
-	dh_makeshlibs -plibkadm5clnt7-heimdal -- -c4
-	dh_makeshlibs -plibkrb5-26-heimdal -- -c4
-	dh_makeshlibs -plibheimntlm0-heimdal -- -c4
-	dh_makeshlibs -plibroken19-heimdal -- -c4
-	dh_makeshlibs -plibwind0-heimdal -- -c4
+	dh_makeshlibs -plibsl0t64-heimdal -- -c4
+	dh_makeshlibs -plibkafs0t64-heimdal -- -c4
+	dh_makeshlibs -plibgssapi3t64-heimdal -- -c4
+	dh_makeshlibs -plibotp0t64-heimdal -- -c4
+	dh_makeshlibs -plibkdc2t64-heimdal -- -c4
+	dh_makeshlibs -plibasn1-8t64-heimdal -- -c4
+	dh_makeshlibs -plibheimbase1t64-heimdal -- -c4
+	dh_makeshlibs -plibhcrypto5t64-heimdal -- -c4
+	dh_makeshlibs -plibhdb9t64-heimdal -- -c4
+	dh_makeshlibs -plibhx509-5t64-heimdal -- -c4
+	dh_makeshlibs -plibkadm5srv8t64-heimdal -- -c4
+	dh_makeshlibs -plibkadm5clnt7t64-heimdal -- -c4
+	dh_makeshlibs -plibkrb5-26t64-heimdal -- -c4
+	dh_makeshlibs -plibheimntlm0t64-heimdal -- -c4
+	dh_makeshlibs -plibroken19t64-heimdal -- -c4
+	dh_makeshlibs -plibwind0t64-heimdal -- -c4
 
 
 override_dh_auto_test:

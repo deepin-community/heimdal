@@ -29,7 +29,7 @@ index 1d620ce..f02dd2e 100644
 @@ -52,7 +52,14 @@ separated from the equal sign with some whitespace). Subsections have a
  other bindings are treated as variable assignments. The value of a
  variable extends to the end of the line.
- 
+
 +Configuration files can also include other files, or all files in a
 +directory.  Use absolute paths in include directives.  When including a
 +directoty, only files whose names consist of alphanumeric, hyphen, or
@@ -46,7 +46,7 @@ index 6293bd7..3c4b0b6 100644
 --- a/lib/krb5/config_file.c
 +++ b/lib/krb5/config_file.c
 @@ -41,6 +41,7 @@
- 
+
  /* Gaah! I want a portable funopen */
  struct fileptr {
 +    krb5_context context;
@@ -88,7 +88,7 @@ index 6293bd7..3c4b0b6 100644
 @@ -399,6 +416,64 @@ is_plist_file(const char *fname)
      return 1;
  }
- 
+
 +/**
 + * Parse configuration files in the given directory and add the result
 + * into res.  Only files whose names consist only of alphanumeric
@@ -153,7 +153,7 @@ index 6293bd7..3c4b0b6 100644
 @@ -423,6 +498,13 @@ krb5_config_parse_file_multi (krb5_context context,
      krb5_error_code ret;
      struct fileptr f;
- 
+
 +    if (context->config_include_depth > 5) {
 +        krb5_warnx(context, "Maximum config file include depth reached; "
 +                   "not including %s", fname);
@@ -166,7 +166,7 @@ index 6293bd7..3c4b0b6 100644
       * current users home directory. The behavior can be disabled and
 @@ -433,6 +515,7 @@ krb5_config_parse_file_multi (krb5_context context,
  	const char *home = NULL;
- 
+
  	if (!_krb5_homedir_access(context)) {
 +            context->config_include_depth--;
  	    krb5_set_error_message(context, EPERM,
@@ -174,7 +174,7 @@ index 6293bd7..3c4b0b6 100644
  	    return EPERM;
 @@ -450,14 +533,18 @@ krb5_config_parse_file_multi (krb5_context context,
  	    int aret;
- 
+
  	    aret = asprintf(&newfname, "%s%s", home, &fname[1]);
 -	    if (aret == -1 || newfname == NULL)
 +	    if (aret == -1 || newfname == NULL) {
@@ -202,7 +202,7 @@ index 6293bd7..3c4b0b6 100644
  	    krb5_set_error_message(context, ret,
  				   "Failed to parse plist %s", fname);
 @@ -483,6 +571,7 @@ krb5_config_parse_file_multi (krb5_context context,
- 
+
  	ret = _krb5_expand_path_tokens(context, fname, 1, &exp_fname);
  	if (ret) {
 +            context->config_include_depth--;
@@ -212,7 +212,7 @@ index 6293bd7..3c4b0b6 100644
 @@ -493,9 +582,11 @@ krb5_config_parse_file_multi (krb5_context context,
  	fname = newfname = exp_fname;
  #endif
- 
+
 +        f.context = context;
  	f.f = fopen(fname, "r");
  	f.s = NULL;
@@ -223,7 +223,7 @@ index 6293bd7..3c4b0b6 100644
  				    fname, strerror(ret));
 @@ -505,6 +596,7 @@ krb5_config_parse_file_multi (krb5_context context,
  	}
- 
+
  	ret = krb5_config_parse_debug (&f, res, &lineno, &str);
 +        context->config_include_depth--;
  	fclose(f.f);
@@ -237,7 +237,7 @@ index 6293bd7..3c4b0b6 100644
 +    f.context = context;
      f.f = NULL;
      f.s = string;
- 
+
 diff --git a/lib/krb5/krb5.conf.5 b/lib/krb5/krb5.conf.5
 index 8a0f084..63ee8cf 100644
 --- a/lib/krb5/krb5.conf.5
@@ -247,13 +247,13 @@ index 8a0f084..63ee8cf 100644
  	/* empty */
  	sections
 +        includes
- 
+
  sections:
  	section sections
 @@ -76,10 +77,22 @@ binding:
  name:
  	STRING
- 
+
 +includes:
 +	'include' path
 +	'includedir' path
@@ -315,7 +315,7 @@ index d372c9a..d6b9a06 100644
 @@ -1,26 +1,14 @@
 -# $Id$
 +include @srcdir@/include-krb5.conf
- 
+
  [libdefaults]
 -	default_realm = TEST.H5L.SE
 -	no-addresses = TRUE
@@ -324,12 +324,12 @@ index d372c9a..d6b9a06 100644
 -	dns_lookup_realm = false
 -	name_canon_rules = as-is:realm=TEST.H5L.SE
 -	name_canon_rules = qualify:domain=test.h5l.se
- 
+
  [realms]
  	TEST.H5L.SE = {
  		kdc = localhost:@port@
  	}
- 
+
 -[domain_realms]
 -	.test.h5l.se = TEST.H5L.SE
 -

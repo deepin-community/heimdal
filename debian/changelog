@@ -1,28 +1,11 @@
-heimdal (7.8.git20221117.28daf24+dfsg-11deepin2) unstable; urgency=medium
-
-  * revert depends 64-bit time_t transition.
-
- -- lichenggang <lichenggang@deepin.org>  Mon, 23 Mar 2026 15:18:26 +0800
-
-heimdal (7.8.git20221117.28daf24+dfsg-11deepin1) unstable; urgency=medium
-
-  * revert 64-bit time_t transition.
-
- -- lichenggang <lichenggang@deepin.org>  Thu, 19 Mar 2026 17:25:16 +0800
-
-heimdal (7.8.git20221117.28daf24+dfsg-11) unstable; urgency=medium
+heimdal (7.8.git20221117.28daf24+dfsg-9+deb13u1) trixie; urgency=medium
 
   * Fix memory leak in heimdal-clients by applying upstream patch from
   https://github.com/heimdal/heimdal/commit/739f7e0484e412de7de6d5ef1100fcc20836d19d
-
- -- Brian May <bam@debian.org>  Thu, 26 Feb 2026 17:37:03 +1100
-
-heimdal (7.8.git20221117.28daf24+dfsg-10) unstable; urgency=medium
-
-  [ Helmut Grohne ]
+  Closes: #1130242.
   * Explicitly depend on libcrypt-dev. (Closes: #1102912)
 
- -- Brian May <bam@debian.org>  Sun, 18 Jan 2026 08:59:40 +1100
+ -- Brian May <bam@debian.org>  Fri, 13 Mar 2026 08:39:34 +1100
 
 heimdal (7.8.git20221117.28daf24+dfsg-9) unstable; urgency=medium
 
